@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PSP">
+<meta name="theme-color" content="#050505">
+<title>Alex Maklai — Q3'26 PSP</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg:#050505; --card:#121212; --card2:#181818; --line:#262626;
+  --txt:#f2f2f2; --dim:#8a8a8a; --dim2:#5c5c5c;
+  --gold:#f5b301; --gold2:#ffd75e; --green:#34d399;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html { background:var(--bg); }
+body {
+  font-family:'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background:var(--bg); color:var(--txt);
+  padding-bottom:calc(84px + env(safe-area-inset-bottom));
+  overflow-x:hidden;
+}
+/* Parallax glow layers */
+.orb { position:fixed; border-radius:50%; filter:blur(90px); pointer-events:none; z-index:0; will-change:transform; }
+#orb1 { width:380px; height:380px; top:-120px; right:-140px; background:rgba(245,179,1,.13); }
+#orb2 { width:300px; height:300px; top:55vh; left:-160px; background:rgba(245,179,1,.07); }
+#orb3 { width:260px; height:260px; top:110vh; right:-100px; background:rgba(255,255,255,.05); }
+
+.app { max-width:520px; margin:0 auto; padding:22px 16px 10px; position:relative; z-index:1; }
+
+/* entrance animation */
+@keyframes rise { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+.rise { animation:rise .45s cubic-bezier(.2,.7,.3,1) both; }
+.rise:nth-child(2){animation-delay:.05s}.rise:nth-child(3){animation-delay:.1s}
+.rise:nth-child(4){animation-delay:.15s}.rise:nth-child(5){animation-delay:.2s}
+.rise:nth-child(6){animation-delay:.25s}
+
+/* Hero */
+.kicker { font-size:10.5px; font-weight:800; letter-spacing:.22em; color:var(--dim); text-transform:uppercase;
+  border:1px solid var(--line); border-radius:99px; padding:6px 14px; display:inline-block; background:rgba(255,255,255,.02); }
+h1.hero { font-size:34px; font-weight:900; letter-spacing:-.02em; margin:14px 0 2px; line-height:1.05; }
+h1.hero .gold { color:var(--gold); }
+h1.hero .gray { color:#6f6f6f; }
+.hero-sub { font-size:13px; color:var(--dim); font-weight:600; margin-bottom:16px; }
+.qbar { height:5px; background:#1c1c1c; border-radius:3px; margin:0 0 22px; overflow:hidden; }
+.qbar > div { height:100%; background:linear-gradient(90deg,var(--gold),var(--gold2)); border-radius:3px; }
+
+.card { background:var(--card); border:1px solid var(--line); border-radius:20px; padding:18px; margin-bottom:12px; }
+
+/* Dashboard cards */
+.dash-card { display:flex; align-items:center; gap:16px; cursor:pointer; transition:transform .15s, border-color .2s; }
+.dash-card:active { transform:scale(.985); }
+.ring { position:relative; width:62px; height:62px; flex:none; }
+.ring svg { transform:rotate(-90deg); display:block; }
+.ring .pct { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; }
+.dash-info { flex:1; min-width:0; }
+.dash-info .name { font-weight:800; font-size:16px; letter-spacing:-.01em; }
+.dash-info .sub { font-size:12.5px; color:var(--dim); margin-top:3px; line-height:1.4; font-weight:500; }
+.chev { color:#3a3a3a; font-size:22px; font-weight:300; }
+
+/* Goal pages */
+.back { border:1px solid var(--line); background:rgba(255,255,255,.02); color:var(--dim); font-size:13px; font-weight:700;
+  cursor:pointer; padding:8px 16px; border-radius:99px; margin-bottom:16px; font-family:inherit; }
+.goal-head { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+.goal-head .emoji { font-size:28px; }
+.goal-head h2 { font-size:24px; font-weight:900; letter-spacing:-.02em; }
+
+.outcome { position:relative; overflow:hidden; }
+.outcome::before { content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg,var(--gc),transparent); }
+.outcome .label { font-size:10px; font-weight:800; letter-spacing:.18em; text-transform:uppercase; color:var(--gold); margin-bottom:8px; }
+.outcome .text { font-size:14px; line-height:1.5; font-weight:600; color:#d9d9d9; }
+.outcome .big { display:flex; align-items:baseline; gap:8px; margin-top:14px; }
+.outcome .big b { font-size:34px; font-weight:900; color:var(--gc); letter-spacing:-.02em; }
+.outcome .big span { font-size:12.5px; color:var(--dim); font-weight:600; }
+.pbar { height:7px; background:#1e1e1e; border-radius:4px; margin-top:12px; overflow:hidden; }
+.pbar > div { height:100%; background:linear-gradient(90deg,var(--gc),var(--gc2)); border-radius:4px; transition:width .4s; }
+
+.mile { display:flex; gap:10px; }
+.mile .m { flex:1; background:var(--card); border:1px solid var(--line); border-radius:18px; padding:14px; }
+.mile .m.hit { border-color:rgba(52,211,153,.4); }
+.mile .m .due { font-size:9.5px; font-weight:800; color:var(--gold); text-transform:uppercase; letter-spacing:.14em; }
+.mile .m .what { font-size:12.5px; font-weight:600; margin-top:6px; line-height:1.45; color:#cfcfcf; }
+.mile .m .stat { font-size:12px; font-weight:700; margin-top:8px; }
+.stat.ok { color:var(--green); } .stat.warn { color:var(--dim); }
+
+h3.sec { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.18em; color:var(--dim2); margin:24px 4px 12px; }
+
+/* Weeks */
+.week { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:14px 16px; margin-bottom:10px; }
+.week.current { border-color:var(--gold); box-shadow:0 0 24px rgba(245,179,1,.12); }
+.week.past-missed { opacity:.7; }
+.wk-head { display:flex; justify-content:space-between; align-items:center; }
+.wk-head .t { font-weight:800; font-size:14px; letter-spacing:-.01em; }
+.wk-head .badge { font-size:9.5px; font-weight:800; letter-spacing:.1em; padding:4px 10px; border-radius:99px; background:var(--gold); color:#0a0a0a; }
+.wk-head .done-badge { color:var(--green); font-size:13px; font-weight:800; }
+.wk-plan { font-size:12.5px; color:var(--dim); margin-top:5px; line-height:1.45; font-weight:500; }
+.checks { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.chk { display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line); border-radius:12px;
+  padding:10px 13px; font-size:13px; font-weight:600; cursor:pointer; user-select:none; background:var(--card2); color:#c9c9c9;
+  transition:all .15s; }
+.chk:active { transform:scale(.96); }
+.chk.on { background:var(--gold); border-color:var(--gold); color:#0a0a0a; font-weight:800; }
+.chk .box { width:17px; height:17px; border-radius:6px; border:2px solid #3d3d3d; display:inline-flex; align-items:center; justify-content:center; font-size:11px; flex:none; }
+.chk.on .box { background:#0a0a0a; border-color:#0a0a0a; color:var(--gold); }
+.note { width:100%; margin-top:12px; border:1px solid var(--line); border-radius:12px; padding:10px 12px; font-size:13px;
+  font-family:inherit; resize:vertical; min-height:40px; background:#0d0d0d; color:#e6e6e6; }
+.note::placeholder { color:#4a4a4a; }
+.note:focus { outline:none; border-color:var(--gold); }
+
+/* Ratings */
+.rates { display:flex; gap:8px; margin-top:12px; }
+.rate { flex:1; }
+.rate label { font-size:10px; font-weight:700; color:var(--dim); display:block; margin-bottom:5px; letter-spacing:.04em; text-transform:uppercase; }
+.rate input { width:100%; border:1px solid var(--line); border-radius:12px; padding:10px 6px; font-size:16px; font-weight:800;
+  text-align:center; background:#0d0d0d; color:var(--gold); font-family:inherit; }
+.rate input:focus { outline:none; border-color:var(--gold); }
+
+/* Measurements */
+.meas { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.meas .mm { background:var(--card2); border:1px solid var(--line); border-radius:14px; padding:12px; }
+.meas .mm label { font-size:9.5px; font-weight:800; color:var(--dim); text-transform:uppercase; letter-spacing:.12em; }
+.meas .mm input { width:100%; border:none; background:transparent; font-size:24px; font-weight:900; margin-top:3px;
+  font-family:inherit; color:var(--txt); letter-spacing:-.02em; }
+.meas .mm input:focus { outline:none; }
+.meas .mm .tgt { font-size:11px; color:var(--dim); margin-top:3px; }
+.meas .mm .tgt b { color:var(--gold); }
+.meas .mm.hit { border-color:rgba(52,211,153,.5); }
+.meas .mm.hit .tgt b { color:var(--green); }
+
+/* Leads counter */
+.leads { text-align:center; }
+.leads .num { font-size:52px; font-weight:900; letter-spacing:-.03em;
+  background:linear-gradient(180deg,var(--gold2),var(--gold)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.leads .of { font-size:12.5px; color:var(--dim); font-weight:600; }
+.lead-btns { display:flex; justify-content:center; gap:9px; margin-top:16px; }
+.lead-btns button { border:none; border-radius:13px; padding:13px 19px; font-size:15px; font-weight:800;
+  background:var(--gold); color:#0a0a0a; cursor:pointer; font-family:inherit; transition:transform .12s; }
+.lead-btns button.minus { background:var(--card2); color:var(--dim); border:1px solid var(--line); }
+.lead-btns button:active { transform:scale(.94); }
+
+/* Bottom nav */
+nav { position:fixed; bottom:0; left:0; right:0; z-index:10;
+  background:rgba(8,8,8,.82); -webkit-backdrop-filter:blur(20px); backdrop-filter:blur(20px);
+  border-top:1px solid #1e1e1e; display:flex; justify-content:space-around;
+  padding:10px 4px calc(10px + env(safe-area-inset-bottom)); }
+nav button { border:none; background:none; font-family:inherit; display:flex; flex-direction:column; align-items:center;
+  gap:3px; font-size:9.5px; font-weight:700; letter-spacing:.04em; color:#565656; cursor:pointer; padding:4px 10px; }
+nav button .ic { font-size:21px; filter:grayscale(1) opacity(.55); transition:filter .2s; }
+nav button.active { color:var(--gold); }
+nav button.active .ic { filter:none; }
+</style>
+</head>
+<body>
+<div class="orb" id="orb1"></div><div class="orb" id="orb2"></div><div class="orb" id="orb3"></div>
+<div class="app" id="app"></div>
+<nav id="nav"></nav>
+<script>
+const START = new Date(2026, 6, 6); // Jul 6 2026
+const QEND = new Date(2026, 9, 1);  // Oct 1 2026
+const WEEKS = 12;
+const MS_W = 7*864e5;
+
+function weekDates(i){
+  const s = new Date(START.getTime() + i*MS_W);
+  const e = new Date(s.getTime() + 6*864e5);
+  const f = d => d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  return f(s) + ' – ' + f(e);
+}
+function sessionDates(i){
+  return [0,2,4].map(o => new Date(START.getTime() + i*MS_W + o*864e5)
+    .toLocaleDateString('en-US',{month:'short',day:'numeric'}));
+}
+function currentWeek(){
+  const n = Math.floor((Date.now() - START.getTime())/MS_W);
+  return Math.max(0, Math.min(WEEKS-1, n));
+}
+
+const PROTEIN = [150,160,170,170,180,180,190,190,200,200,200,200];
+const SINGING = [null,'Practice singing 1+ day','Practice singing 2+ days',...Array(9).fill('Practice singing 3+ days')];
+const CHECKIN_WEEKS = [4,8,11];
+const MONEY_PLAN = [
+  'Finalize funnel strategy: channel, offer, messaging, pricing, ideal client',
+  'Build funnel infrastructure: pages, CRM, automations, follow-up, KPI dashboard',
+  'Create marketing assets: ads, content, emails, scripts + internal testing',
+  'LAUNCH: ads on, organic publishing, monitor daily, fix issues',
+  'Analyze week-1 data; improve ads, landing page, follow-up, messaging',
+  'Close first wave of clients; document objections, refine sales process',
+  'Optimize funnel; improve conversion, increase lead volume',
+  'Standardize: SOPs for lead handling, follow-up, onboarding',
+  'Scale what works; keep conversion quality while raising volume',
+  'Find the biggest bottleneck; complete one major optimization',
+  'Push to target: daily KPI reviews, coach sales, optimize follow-up',
+  'Finish the quarter; review metrics, document lessons, next-quarter plan'
+];
+
+const HEALTH_TARGETS = {
+  shoulders:{base:53.5, q:54, dir:1, label:'Shoulders'},
+  biceps:{base:15, q:15.5, dir:1, label:'Biceps'},
+  waist:{base:40.5, q:39.5, dir:-1, label:'Waist'},
+  chest:{base:44, q:44.5, dir:1, label:'Chest'}
+};
+
+const DEFAULT = {
+  love:{ weeks: Array.from({length:WEEKS},()=>({done:false,note:'',fa:'',lv:'',cm:''})) },
+  health:{ weeks: Array.from({length:WEEKS},()=>({s:[false,false,false],protein:false,note:''})),
+           meas:{shoulders:'',biceps:'',waist:'',chest:''} },
+  money:{ leads:0, weeks: Array.from({length:WEEKS},()=>({done:false,note:''})),
+          funnelBuilt:false, adsLive:false, dashWorks:false },
+  fun:{ weeks: Array.from({length:WEEKS},()=>({music:false,singing:false,note:''})) }
+};
+// Pre-filled from PSP (weeks 1–2)
+DEFAULT.love.weeks[0] = {done:true, fa:'10', lv:'10', cm:'10', note:"Incredible week: sister's birthday, talked about our future, huge love both ways, fun playful moments."};
+DEFAULT.love.weeks[1] = {done:true, fa:'10', lv:'10', cm:'10', note:'Flowers delivery, daily contact, clear communication, intentional listening, future talks.'};
+DEFAULT.health.weeks[0] = {s:[true,true,false], protein:true, note:'Only 2 EMS sessions (was with Taylor). Buying home bench + adjustable dumbbells.'};
+DEFAULT.health.weeks[1] = {s:[true,true,false], protein:false, note:''};
+DEFAULT.money.weeks[0] = {done:false, note:"Didn't do it this week — moved to next week."};
+DEFAULT.fun.weeks[0] = {music:true, singing:false, note:'Played songs for Taylor — made her day.'};
+DEFAULT.fun.weeks[1] = {music:true, singing:false, note:'Created a couple of songs, played for Bees, real fun.'};
+
+let S;
+try {
+  const saved = JSON.parse(localStorage.getItem('psp-q326'));
+  S = saved && saved.love ? saved : structuredClone(DEFAULT);
+} catch(e){ S = structuredClone(DEFAULT); }
+function save(){ localStorage.setItem('psp-q326', JSON.stringify(S)); }
+
+const GOALS = {
+  love:{emoji:'❤️', name:'Love', c:'#ff5c7a', c2:'#ff8ba0',
+    outcome:'10/10 relationship with Taylor: Future Alignment · Love · Communication'},
+  health:{emoji:'💪', name:'Health', c:'#7c8cff', c2:'#a5b0ff',
+    outcome:'Shoulders 54" · Biceps 15.5" · Waist 39.5" · Chest 44.5" — avg 3 gym/EMS sessions per week'},
+  money:{emoji:'💰', name:'Money', c:'#34d399', c2:'#6ee7b7',
+    outcome:'500 qualified leads / low-ticket sales this quarter'},
+  fun:{emoji:'🎵', name:'Fun', c:'#f5b301', c2:'#ffd75e',
+    outcome:'12 music sessions in 90 days — one every week, real fun'}
+};
+
+// ---- progress calcs ----
+function loveP(){ return S.love.weeks.filter(w=>w.done).length / WEEKS; }
+function healthSessions(){ return S.health.weeks.reduce((a,w)=>a+w.s.filter(Boolean).length,0); }
+function healthP(){ return healthSessions() / 36; }
+function moneyP(){ return Math.min(1, S.money.leads/500); }
+function funSessions(){ return S.fun.weeks.filter(w=>w.music).length; }
+function funP(){ return funSessions() / 12; }
+const PROG = {love:loveP, health:healthP, money:moneyP, fun:funP};
+
+function subText(g){
+  if(g==='love'){ const d=S.love.weeks.filter(w=>w.done).length; const nx=CHECKIN_WEEKS.find(i=>!(S.love.weeks[i].fa&&S.love.weeks[i].lv&&S.love.weeks[i].cm)); return d+'/12 weeks · '+(nx!==undefined?'next check-in wk '+(nx+1):'all check-ins done'); }
+  if(g==='health') return healthSessions()+'/36 sessions · '+['shoulders','biceps','waist','chest'].filter(k=>{const t=HEALTH_TARGETS[k],v=parseFloat(S.health.meas[k]);return v&&(t.dir>0?v>=t.q:v<=t.q);}).length+'/4 measurements hit';
+  if(g==='money') return S.money.leads+'/500 leads · 50 due by Aug 10';
+  return funSessions()+'/12 sessions · 4 due by Aug 10, 8 by Sep 5';
+}
+
+// ---- rendering ----
+let view = 'home';
+const app = document.getElementById('app');
+const nav = document.getElementById('nav');
+const esc = s => (s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function ring(pct, color){
+  const r=26, c=2*Math.PI*r, off=c*(1-pct);
+  return `<div class="ring"><svg width="62" height="62"><circle cx="31" cy="31" r="${r}" fill="none" stroke="#1f1f1f" stroke-width="5"/><circle cx="31" cy="31" r="${r}" fill="none" stroke="${color}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${off}"/></svg><div class="pct" style="color:${color}">${Math.round(pct*100)}%</div></div>`;
+}
+
+function renderHome(){
+  const cw = currentWeek();
+  const days = Math.max(0, Math.floor((Date.now()-START.getTime())/864e5));
+  const total = Math.floor((QEND-START)/864e5);
+  let h = `<div class="rise"><span class="kicker">Alex Maklai · Personal Strategic Plan</span>
+    <h1 class="hero">Q3'26 <span class="gold">PSP</span><br><span class="gray">Tracker</span></h1>
+    <div class="hero-sub">Week ${cw+1} of 12 · quarter ends Oct 1</div>
+    <div class="qbar"><div style="width:${Math.min(100,days/total*100)}%"></div></div></div>`;
+  for(const g of ['love','health','money','fun']){
+    const G = GOALS[g], p = PROG[g]();
+    h += `<div class="card dash-card rise" onclick="go('${g}')">
+      ${ring(p, G.c)}
+      <div class="dash-info"><div class="name">${G.emoji} ${G.name}</div><div class="sub">${esc(subText(g))}</div></div>
+      <div class="chev">›</div></div>`;
+  }
+  app.innerHTML = h;
+}
+
+function milestones(g){
+  let m30, m60;
+  if(g==='love'){
+    const ok30 = !!(S.love.weeks[4].fa&&S.love.weeks[4].lv&&S.love.weeks[4].cm);
+    m30 = {what:'Check-in with Taylor: rate Future Alignment / Love / Communication', stat: ok30?'Done':'Pending', ok:ok30};
+    const ok60 = !!(S.love.weeks[8].fa&&S.love.weeks[8].lv&&S.love.weeks[8].cm);
+    m60 = {what:'Second check-in: rate all 3 areas, plan improvements', stat: ok60?'Done':'Pending', ok:ok60};
+  }
+  if(g==='health'){
+    const n = healthSessions();
+    m30 = {what:'12 workouts · Waist ≤40" · Chest ≥44.2" · Shoulders ≥53.7" · Biceps ≥15.2"', stat:n+'/12 workouts', ok:n>=12};
+    m60 = {what:'24 workouts · Waist ≤39.75" · Chest ≥44.35" · Shoulders ≥53.9" · Biceps ≥15.4"', stat:n+'/24 workouts', ok:n>=24};
+  }
+  if(g==='money'){
+    m30 = {what:'50+ leads · funnel fully built · ads live', stat:S.money.leads+'/50 leads', ok:S.money.leads>=50&&S.money.funnelBuilt&&S.money.adsLive};
+    m60 = {what:'200+ total leads · auto lead-tracking dashboard works', stat:S.money.leads+'/200 leads', ok:S.money.leads>=200&&S.money.dashWorks};
+  }
+  if(g==='fun'){
+    const n = funSessions();
+    m30 = {what:'4 music sessions completed', stat:n+'/4 sessions', ok:n>=4};
+    m60 = {what:'8 music sessions completed', stat:n+'/8 sessions', ok:n>=8};
+  }
+  return `<div class="mile rise">
+    <div class="m ${m30.ok?'hit':''}"><div class="due">30-Day · Aug 10</div><div class="what">${m30.what}</div><div class="stat ${m30.ok?'ok':'warn'}">${m30.ok?'✓ ':''}${m30.stat}</div></div>
+    <div class="m ${m60.ok?'hit':''}"><div class="due">60-Day · Sep 5</div><div class="what">${m60.what}</div><div class="stat ${m60.ok?'ok':'warn'}">${m60.ok?'✓ ':''}${m60.stat}</div></div>
+  </div>`;
+}
+
+function goalShell(g, inner, bigStat){
+  const G = GOALS[g], p = PROG[g]();
+  app.innerHTML = `<div style="--gc:${G.c};--gc2:${G.c2}">
+    <button class="back rise" onclick="go('home')">‹ Overview</button>
+    <div class="goal-head rise"><span class="emoji">${G.emoji}</span><h2>${G.name}</h2></div>
+    <div class="card outcome rise">
+      <div class="label">Quarter Outcome · by Oct 1</div>
+      <div class="text">${G.outcome}</div>
+      <div class="big">${bigStat}</div>
+      <div class="pbar"><div style="width:${Math.min(100,p*100)}%"></div></div>
+    </div>
+    ${milestones(g)}
+    ${inner}
+  </div>`;
+}
+
+function weekShell(i, inner, doneFlag){
+  const cw = currentWeek();
+  const cls = i===cw ? 'current' : (i<cw && !doneFlag ? 'past-missed' : '');
+  return `<div class="week ${cls}">
+    <div class="wk-head"><span class="t">Wk ${i+1} · ${weekDates(i)}</span>
+    ${i===cw?'<span class="badge">THIS WEEK</span>':(doneFlag?'<span class="done-badge">✓</span>':'')}</div>
+    ${inner}</div>`;
+}
+
+function chk(on, label, fn){
+  return `<span class="chk ${on?'on':''}" onclick="${fn}"><span class="box">${on?'✓':''}</span>${label}</span>`;
+}
+
+function renderLove(){
+  let weeks = '';
+  S.love.weeks.forEach((w,i)=>{
+    const isCheckin = CHECKIN_WEEKS.includes(i);
+    let inner = `<div class="wk-plan">${isCheckin?'CHECK-IN: rate the 3 areas with Taylor':'Do something amazing for Taylor in 1+ areas'}</div>
+      <div class="checks">${chk(w.done, isCheckin?'Check-in done':'Did something amazing', `T('love',${i},'done')`)}</div>`;
+    if(isCheckin || w.fa || w.lv || w.cm){
+      inner += `<div class="rates">
+        <div class="rate"><label>Future</label><input type="number" min="1" max="10" inputmode="numeric" value="${esc(w.fa)}" onchange="R(${i},'fa',this.value)"></div>
+        <div class="rate"><label>Love</label><input type="number" min="1" max="10" inputmode="numeric" value="${esc(w.lv)}" onchange="R(${i},'lv',this.value)"></div>
+        <div class="rate"><label>Comms</label><input type="number" min="1" max="10" inputmode="numeric" value="${esc(w.cm)}" onchange="R(${i},'cm',this.value)"></div>
+      </div>`;
+    }
+    inner += `<textarea class="note" placeholder="What happened…" onchange="N('love',${i},this.value)">${esc(w.note)}</textarea>`;
+    weeks += weekShell(i,inner,w.done);
+  });
+  const d = S.love.weeks.filter(w=>w.done).length;
+  goalShell('love', `<h3 class="sec rise">Weekly Actions</h3><div class="rise">${weeks}</div>`, `<b>${d}/12</b><span>weeks delivered</span>`);
+}
+
+function renderHealth(){
+  let meas = '<div class="card rise"><h3 class="sec" style="margin:0 0 12px">Measurements → Quarter Target</h3><div class="meas">';
+  for(const k of ['shoulders','biceps','waist','chest']){
+    const t = HEALTH_TARGETS[k], v = parseFloat(S.health.meas[k]);
+    const hit = v && (t.dir>0 ? v>=t.q : v<=t.q);
+    meas += `<div class="mm ${hit?'hit':''}"><label>${t.label}</label>
+      <input type="number" step="0.1" inputmode="decimal" placeholder="${t.base}" value="${esc(S.health.meas[k])}" onchange="M('${k}',this.value)">
+      <div class="tgt">${t.base}" → <b>${t.q}"${hit?' ✓':''}</b></div></div>`;
+  }
+  meas += '</div></div>';
+  let weeks = '';
+  S.health.weeks.forEach((w,i)=>{
+    const dates = sessionDates(i);
+    let inner = `<div class="wk-plan">3 sessions · ${PROTEIN[i]}g protein 6 of 7 days</div><div class="checks">`;
+    dates.forEach((d,j)=> inner += chk(w.s[j], d, `HS(${i},${j})`));
+    inner += chk(w.protein, PROTEIN[i]+'g protein', `T('health',${i},'protein')`) + '</div>';
+    inner += `<textarea class="note" placeholder="Notes…" onchange="N('health',${i},this.value)">${esc(w.note)}</textarea>`;
+    weeks += weekShell(i,inner, w.s.every(Boolean));
+  });
+  goalShell('health', meas + `<h3 class="sec rise">Weekly Sessions</h3><div class="rise">${weeks}</div>`,
+    `<b>${healthSessions()}/36</b><span>sessions · goal 3/week</span>`);
+}
+
+function renderMoney(){
+  const counter = `<div class="card leads rise">
+    <div class="num">${S.money.leads}</div><div class="of">of 500 qualified leads</div>
+    <div class="lead-btns">
+      <button class="minus" onclick="L(-1)">−1</button>
+      <button onclick="L(1)">+1 lead</button>
+      <button onclick="L(5)">+5</button>
+      <button onclick="L(10)">+10</button>
+    </div>
+    <div class="checks" style="justify-content:center;margin-top:16px">
+      ${chk(S.money.funnelBuilt,'Funnel built',"TM('funnelBuilt')")}
+      ${chk(S.money.adsLive,'Ads live',"TM('adsLive')")}
+      ${chk(S.money.dashWorks,'Lead dashboard works',"TM('dashWorks')")}
+    </div></div>`;
+  let weeks = '';
+  S.money.weeks.forEach((w,i)=>{
+    let inner = `<div class="wk-plan">${MONEY_PLAN[i]}</div>
+      <div class="checks">${chk(w.done,'Done',`T('money',${i},'done')`)}</div>
+      <textarea class="note" placeholder="Results…" onchange="N('money',${i},this.value)">${esc(w.note)}</textarea>`;
+    weeks += weekShell(i,inner,w.done);
+  });
+  goalShell('money', counter + `<h3 class="sec rise">Weekly Plan</h3><div class="rise">${weeks}</div>`,
+    `<b>${S.money.leads}/500</b><span>leads (call booked + $5K budget, or low-ticket buyer)</span>`);
+}
+
+function renderFun(){
+  let weeks = '';
+  S.fun.weeks.forEach((w,i)=>{
+    let inner = `<div class="wk-plan">Music session: write / finalize / learn a song, dance class, lesson, or jam${SINGING[i]?' · '+SINGING[i]:''}</div>
+      <div class="checks">${chk(w.music,'Music session',`T('fun',${i},'music')`)}${SINGING[i]?chk(w.singing,'Singing practice',`T('fun',${i},'singing')`):''}</div>
+      <textarea class="note" placeholder="What did you play…" onchange="N('fun',${i},this.value)">${esc(w.note)}</textarea>`;
+    weeks += weekShell(i,inner,w.music);
+  });
+  goalShell('fun', `<h3 class="sec rise">Weekly Sessions</h3><div class="rise">${weeks}</div>`,
+    `<b>${funSessions()}/12</b><span>music sessions</span>`);
+}
+
+// ---- actions ----
+window.T = (g,i,k)=>{ S[g].weeks[i][k] = !S[g].weeks[i][k]; save(); render(false); };
+window.N = (g,i,v)=>{ S[g].weeks[i].note = v; save(); };
+window.R = (i,k,v)=>{ S.love.weeks[i][k] = v; save(); render(false); };
+window.HS = (i,j)=>{ S.health.weeks[i].s[j] = !S.health.weeks[i].s[j]; save(); render(false); };
+window.M = (k,v)=>{ S.health.meas[k] = v; save(); render(false); };
+window.L = n=>{ S.money.leads = Math.max(0, S.money.leads+n); save(); render(false); };
+window.TM = k=>{ S.money[k] = !S.money[k]; save(); render(false); };
+window.go = v=>{ view = v; render(true); window.scrollTo(0,0); };
+
+function render(animate){
+  const y = window.scrollY;
+  ({home:renderHome, love:renderLove, health:renderHealth, money:renderMoney, fun:renderFun})[view]();
+  if(!animate){ document.querySelectorAll('.rise').forEach(el=>el.style.animation='none'); window.scrollTo(0,y); }
+  nav.innerHTML = [['home','◆','Overview'],['love','❤️','Love'],['health','💪','Health'],['money','💰','Money'],['fun','🎵','Fun']]
+    .map(([v,ic,l])=>`<button class="${view===v?'active':''}" onclick="go('${v}')"><span class="ic">${v==='home'?'<span style="color:'+(view===v?'#f5b301':'#565656')+'">◆</span>':ic}</span>${l}</button>`).join('');
+}
+render(true);
+
+// Parallax
+const o1=document.getElementById('orb1'), o2=document.getElementById('orb2'), o3=document.getElementById('orb3');
+let ticking=false;
+window.addEventListener('scroll', ()=>{
+  if(ticking) return; ticking=true;
+  requestAnimationFrame(()=>{
+    const y=window.scrollY;
+    o1.style.transform=`translateY(${y*.25}px)`;
+    o2.style.transform=`translateY(${-y*.12}px)`;
+    o3.style.transform=`translateY(${-y*.3}px)`;
+    ticking=false;
+  });
+}, {passive:true});
+</script>
+</body>
+</html>
