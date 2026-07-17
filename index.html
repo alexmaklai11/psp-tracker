@@ -29,7 +29,7 @@ body {
 #orb2 { width:300px; height:300px; top:55vh; left:-160px; background:rgba(245,179,1,.07); }
 #orb3 { width:260px; height:260px; top:110vh; right:-100px; background:rgba(255,255,255,.05); }
 
-.app { max-width:520px; margin:0 auto; padding:22px 16px 10px; position:relative; z-index:1; }
+.app { max-width:520px; margin:0 auto; padding:calc(20px + env(safe-area-inset-top)) 16px 10px; position:relative; z-index:1; }
 
 /* entrance animation */
 @keyframes rise { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
@@ -62,8 +62,9 @@ h1.hero .gray { color:#6f6f6f; }
 .chev { color:#3a3a3a; font-size:22px; font-weight:300; }
 
 /* Goal pages */
-.back { border:1px solid var(--line); background:rgba(255,255,255,.02); color:var(--dim); font-size:13px; font-weight:700;
-  cursor:pointer; padding:8px 16px; border-radius:99px; margin-bottom:16px; font-family:inherit; }
+.back { border:1px solid var(--line); background:rgba(12,12,12,.75); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+  color:#c9c9c9; font-size:13px; font-weight:700; cursor:pointer; padding:9px 16px; border-radius:99px; margin-bottom:16px;
+  font-family:inherit; position:sticky; top:calc(10px + env(safe-area-inset-top)); z-index:20; }
 .goal-head { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
 .goal-head .emoji { font-size:28px; }
 .goal-head h2 { font-size:24px; font-weight:900; letter-spacing:-.02em; }
