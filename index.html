@@ -229,6 +229,22 @@ try {
 } catch(e){ S = structuredClone(DEFAULT); }
 function save(){ localStorage.setItem('psp-q326', JSON.stringify(S)); }
 
+let hideLove = localStorage.getItem('psp-hide-love') !== '0'; // hidden by default
+let heroTaps = 0, heroTimer = null;
+window.heroTap = ()=>{
+  heroTaps++;
+  clearTimeout(heroTimer);
+  heroTimer = setTimeout(()=>{ heroTaps = 0; }, 1200);
+  if(heroTaps >= 3){
+    heroTaps = 0;
+    hideLove = !hideLove;
+    localStorage.setItem('psp-hide-love', hideLove ? '1' : '0');
+    if(hideLove && view === 'love') view = 'home';
+    render(true);
+  }
+};
+function visibleGoals(){ return ['love','health','money','fun'].filter(g => g !== 'love' || !hideLove); }
+
 const GOALS = {
   love:{emoji:'❤️', name:'Love', c:'#ff5c7a', c2:'#ff8ba0',
     outcome:'10/10 relationship with Taylor: Future Alignment · Love · Communication'},
@@ -272,10 +288,10 @@ function renderHome(){
   const days = Math.max(0, Math.floor((Date.now()-START.getTime())/864e5));
   const total = Math.floor((QEND-START)/864e5);
   let h = `<div class="rise"><span class="kicker">Alex Maklai · Personal Strategic Plan</span>
-    <h1 class="hero">Q3'26 <span class="gold">PSP</span><br><span class="gray">Tracker</span></h1>
+    <h1 class="hero" onclick="heroTap()">Q3'26 <span class="gold">PSP</span><br><span class="gray">Tracker</span></h1>
     <div class="hero-sub">Week ${cw+1} of 12 · quarter ends Oct 1</div>
     <div class="qbar"><div style="width:${Math.min(100,days/total*100)}%"></div></div></div>`;
-  for(const g of ['love','health','money','fun']){
+  for(const g of visibleGoals()){
     const G = GOALS[g], p = PROG[g]();
     h += `<div class="card dash-card rise" onclick="go('${g}')">
       ${ring(p, G.c)}
@@ -437,6 +453,7 @@ function render(animate){
   ({home:renderHome, love:renderLove, health:renderHealth, money:renderMoney, fun:renderFun})[view]();
   if(!animate){ document.querySelectorAll('.rise').forEach(el=>el.style.animation='none'); window.scrollTo(0,y); }
   nav.innerHTML = [['home','◆','Overview'],['love','❤️','Love'],['health','💪','Health'],['money','💰','Money'],['fun','🎵','Fun']]
+    .filter(([v])=> v !== 'love' || !hideLove)
     .map(([v,ic,l])=>`<button class="${view===v?'active':''}" onclick="go('${v}')"><span class="ic">${v==='home'?'<span style="color:'+(view===v?'#f5b301':'#565656')+'">◆</span>':ic}</span>${l}</button>`).join('');
 }
 render(true);
